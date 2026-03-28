@@ -90,11 +90,7 @@ if 'page' not in st.session_state:
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
-# BURASI ÖNEMLİ: Mesajların içine yazılacağı konteynırı en başta tanımlıyoruz
-with st.container():
-    # Görseldeki kutu yapısını başlatıyoruz
-    st.markdown(f'<div class="main-border">', unsafe_allow_html=True)
-    st.subheader(f"LAYOUT ({st.session_state.page.upper()})")
+
     
     # Mesajların basılacağı alan
     chat_area = st.container()
