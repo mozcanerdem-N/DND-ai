@@ -2,7 +2,7 @@ import streamlit as st
 from groq import Groq
 import random
 
-# --- SAYFA ---
+# --- SAYFA AYARI ---
 st.set_page_config(layout="wide")
 
 # --- SESSION ---
@@ -15,20 +15,42 @@ if "messages" not in st.session_state:
 if "api_key" not in st.session_state:
     st.session_state.api_key = ""
 
-# --- CSS (görünüm) ---
+# --- CSS FIXLER ---
 st.markdown("""
 <style>
+
+/* ÜST BOŞLUK FIX */
 .block-container {
-    padding-top: 1rem;
+    padding-top: 0.5rem !important;
 }
-.left-panel {
-    border-right: 2px solid #ccc;
+
+/* BAŞLIK FIX */
+h1, h2, h3 {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+}
+
+/* SOL PANEL ÜSTE YAPIŞTIR */
+section[data-testid="column"] > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* CHAT CONTAINER */
+.chat-container {
+    height: 70vh;
+    overflow-y: auto;
     padding: 10px;
+    border: 1px solid #444;
+    border-radius: 10px;
 }
-.menu-btn {
+
+/* BUTON FULL WIDTH */
+button {
     width: 100%;
-    margin-bottom: 5px;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -39,47 +61,53 @@ left, right = st.columns([1, 4])
 # 📌 SOL PANEL
 # =========================
 with left:
-    st.markdown("### API ANAHTARI")
+    st.markdown("### 🔑 API ANAHTARI")
     api = st.text_input("Groq API Key", type="password")
 
     if api:
         st.session_state.api_key = api
 
     st.markdown("---")
-    st.markdown("### OYUN DOSYASI")
+
+    st.markdown("### 📂 OYUN DOSYASI")
     st.file_uploader("Yükle", type=["json"])
 
-    st.markdown("### SAVE DOSYASI")
+    st.markdown("### 💾 SAVE DOSYASI")
     st.file_uploader("Yükle", type=["json"], key="save")
 
     st.markdown("---")
-    st.markdown("### MENÜ")
 
-    if st.button("💬 Chat", use_container_width=True):
+    st.markdown("### 📌 MENÜ")
+
+    if st.button("💬 Chat"):
         st.session_state.page = "chat"
 
-    if st.button("📊 İstatistikler", use_container_width=True):
+    if st.button("📊 İstatistikler"):
         st.session_state.page = "stats"
 
-    if st.button("📜 Hikaye Özeti", use_container_width=True):
+    if st.button("📜 Hikaye Özeti"):
         st.session_state.page = "story"
 
-    if st.button("🎒 Çanta", use_container_width=True):
+    if st.button("🎒 Çanta"):
         st.session_state.page = "inventory"
 
 # =========================
-# 📌 SAĞ PANEL (DEĞİŞEN)
+# 📌 SAĞ PANEL
 # =========================
 with right:
 
-    # 🔹 CHAT EKRANI
+    # 💬 CHAT
     if st.session_state.page == "chat":
 
         st.markdown("## 💬 Chat")
 
+        st.markdown('<div class="chat-container">', unsafe_allow_html=True)
+
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
                 st.write(msg["content"])
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
         prompt = st.chat_input("Mesaj yaz...")
 
@@ -99,7 +127,7 @@ with right:
 
                         cevap = client.chat.completions.create(
                             messages=[
-                                {"role": "system", "content": "Sen bir RPG oyun anlatıcısısın."},
+                                {"role": "system", "content": "Sen bir DND oyun anlatıcısısın. Oyuncunun eylemlerine göre sahneyi anlat."},
                                 {"role": "user", "content": prompt}
                             ],
                             model="llama-3.1-8b-instant"
@@ -108,18 +136,19 @@ with right:
                     st.write(cevap)
                     st.session_state.messages.append({"role": "assistant", "content": cevap})
 
-    # 🔹 İSTATİSTİK
+    # 📊 İSTATİSTİK
     elif st.session_state.page == "stats":
         st.markdown("## 📊 İstatistikler")
         st.write("HP: 30")
         st.write("Strength: 5")
+        st.write("Intelligence: 3")
 
-    # 🔹 HİKAYE ÖZETİ
+    # 📜 HİKAYE
     elif st.session_state.page == "story":
         st.markdown("## 📜 Hikaye Özeti")
-        st.write("Henüz kayıtlı bir olay yok.")
+        st.write("Henüz olay yok...")
 
-    # 🔹 ENVANTER
+    # 🎒 ENVANTER
     elif st.session_state.page == "inventory":
         st.markdown("## 🎒 Çanta")
         st.write("- Kılıç")
