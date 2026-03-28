@@ -26,7 +26,7 @@ with st.sidebar:
     st.markdown("### OYUN DOSYASI")
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.button("🟥", key="game_stop")
+        st.button("🗑️", key="game_stop")
     with col2:
         st.button("⬆️", key="game_up")
     with col3:
@@ -36,7 +36,7 @@ with st.sidebar:
     st.markdown("### SAVE DOSYASI")
     scol1, scol2, scol3 = st.columns(3)
     with scol1:
-        st.button("🟥", key="save_stop")
+        st.button("🗑️", key="save_stop")
     with scol2:
         st.button("⬆️", key="save_up")
     with scol3:
