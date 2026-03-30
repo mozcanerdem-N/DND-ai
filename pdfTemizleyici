@@ -1,0 +1,46 @@
+!pip install pymupdf
+
+import fitz
+import re
+from datetime import datetime, timezone, timedelta
+from google.colab import files
+
+uploaded = files.upload()
+pdf_path = list(uploaded.keys())[0]
+
+doc = fitz.open(pdf_path)
+
+text = ""
+for page in doc:
+    text += page.get_text()
+
+# bölünmüş kelimeler
+text = re.sub(r'-\n', '', text)
+
+# satır başı boşlukları kaldır
+text = re.sub(r'^[ \t]+', '', text, flags=re.MULTILINE)
+
+# fazla boşlukları temizle
+text = re.sub(r'[ \t]+', ' ', text)
+
+# BOŞ SATIRLARI KALDIR
+text = re.sub(r'\n\s*\n', '\n', text)
+
+# TDK noktalama
+text = re.sub(r'\s+([.,;:!?])', r'\1', text)
+text = re.sub(r'([.,;:!?])([^\s])', r'\1 \2', text)
+
+text = text.strip()
+
+# dosya oluştur
+utc_minus8 = timezone(timedelta(hours=-8))
+timestamp = datetime.now(utc_minus8).strftime("%Y-%m-%d_%H-%M")
+
+filename = f"temiz_metin_{timestamp}.txt"
+
+with open(filename, "w", encoding="utf-8") as f:
+    f.write(text)
+
+files.download(filename)
+
+print("Tamamlandı:", filename)
